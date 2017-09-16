@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="icon" href="snake-icon.png">
+	<title>Snake in 4 min</title>
+	<style>
+		body {
+			font-family: "Courier New", monospace;
+			text-align: center;
+			background-color: #ddd;
+		}
+		h1 {
+			color: #1658C2;
+			text-shadow: 2px 2px 2px #999;
+		}
+		p {
+			font-size: 20px;
+			font-weight: bold;
+		}
+		#myCanvas {
+			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+		}
+	</style>
+</head>
+<body>
+	
+	<h1>Snake Game</h1>
+	<canvas id="myCanvas" height="400" width="400"></canvas>
+	<p>Score: <span id="score"></span></p>
+
+	<script>
+		window.onload = function() {
+			canv = document.getElementById("myCanvas");
+			ctx = canv.getContext("2d");
+			document.addEventListener("keydown", keyPush);
+			setInterval(game, 1000/10); // snake speed
+		}
+		
+		var px = py = 10; // player position
+		var gs = tc = 20; // grid size and tile count (20*20=400)
+		var ax = ay = 15; // initial apple position
+		var xv = yv = 0; // velosity
+		var trail = []; // previous positions
+		const initialTale = 3;
+		var tail = initialTale; // tail of the snake
+		var score = document.getElementById("score");
+
+		function game() {
+			px += xv;
+			py += yv;
+
+			// wrap along X
+			if (px < 0) {
+				px = tc - 1;
+			}
+			if (px > tc-1) {
+				px = 0;
+			}
+			// wrap along Y
+			if (py < 0) {
+				py = tc - 1;
+			}
+			if (py > tc-1) {
+				py = 0;
+			}
+
+			// draw background
+			ctx.fillStyle = "#333";
+			ctx.fillRect(0, 0, canv.width, canv.height);
+			// draw apple
+			ctx.fillStyle = "#ff3399";
+			ctx.fillRect(ax*gs, ay*gs, gs-2, gs-2);
+			// draw snake
+			ctx.fillStyle = "#88ff66";
+			for (var i = 0; i < trail.length; i++) {
+					ctx.fillRect(trail[i].x*gs, trail[i].y*gs, gs-2, gs-2);
+					if (trail[i].x==px && trail[i].y==py) { // snake bit its tail
+						tail = 3;
+					}
+			}
+
+			trail.push({x:px, y:py});
+
+			while (trail.length > tail) {
+				trail.shift(); // trim down the tail
+			}
+
+			if (ax==px && ay==py) { // snake bit apple
+				tail++;
+				ax = Math.floor(Math.random()*tc); // new apple position
+				ay = Math.floor(Math.random()*tc);
+			}
+
+			score.innerHTML = trail.length - initialTale; // score
+		}
+
+		function keyPush(event) {
+			switch (event.keyCode) {
+				case 37: // left arrow key
+					xv = -1; yv = 0;
+					break;
+				case 38: // up arrow key
+					xv = 0; yv = -1;
+					break;
+				case 39: // right arrow key
+					xv = 1; yv = 0;
+					break;
+				case 40: // down arrow key
+					xv = 0; yv = 1;
+					break;
+			}
+		}
+	</script>
+
+</body>
+</html>
+
+<!-- https://www.youtube.com/watch?v=xGmXxpIj6vs -->
